@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "lib": ["ES2020", "dom"],
+    "types": ["node"],
+    "module": "NodeNext",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
+  }
+}
