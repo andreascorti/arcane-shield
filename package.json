@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc",
     "check": "biome check ./src",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",

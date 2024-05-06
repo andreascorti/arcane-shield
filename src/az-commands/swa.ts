@@ -28,6 +28,6 @@ export async function retrieveStaticWebApps(subscriptionId: string) {
       customDomains: swa.customDomains.map((domain: SecureDomain) => ({domain})),
       linkedBackends: swa.linkedBackends,
       privateEndpointConnections: swa.privateEndpointConnections,
-      databaseConnections: swa.databseConnections
+      databaseConnections: swa.databaseConnections
     }));
 }

@@ -12,7 +12,7 @@ export type SWA = {
     customDomains: SecureDomain[];
     linkedBackends: string[];
     privateEndpointConnections: string[];
-    databseConnections: string[];
+    databaseConnections: string[];
 }
 
 export type SecureDomain = {
