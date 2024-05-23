@@ -18,6 +18,7 @@ export type SWA = {
 export type SecureDomain = {
     domain: string;
     waf?: boolean;
+    httpStatusCode?: string;
     firewall?: string;
     manufacturer?: string;
 }

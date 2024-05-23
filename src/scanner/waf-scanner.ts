@@ -26,10 +26,15 @@ export async function scanDomain(name: string, domain: SecureDomain) {
     }
     const domainResult: {detected: boolean, firewall: string, manufacturer: string} = JSON.parse(
         readFileSync(`${name}.${domain.domain}.json`, 'utf8'))[0];
+    
+        //Try to curl to get the status code
+    const httpStatus = await exec(`curl -s -o /dev/null -w "%{http_code}" --location https://${domain.domain}`);
+
     unlinkSync(`${name}.${domain.domain}.json`);
     return {
         ...domain,
         waf: domainResult.detected,
+        httpStatusCode: httpStatus.stdout,
         firewall: domainResult.firewall,
         manufacturer: domainResult.manufacturer
     };

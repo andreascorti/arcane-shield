@@ -19,6 +19,7 @@ export function printConsoleDomain(domain: SecureDomain, isDefault = false) {
         console.log("\t\t Firewall:", chalk.green(domain.firewall));
         console.log("\t\t Manufacturer:", chalk.green(domain.manufacturer));
     }
+    console.log("\t HTTP Status code:", domain.httpStatusCode === '200' ? chalk.green(domain.httpStatusCode) : chalk.red(domain.httpStatusCode));
 }
 
 export function writeJSONOutput(output: string, sub: string, enhancedSWAs: SWA[]) {
@@ -32,11 +33,11 @@ export function writeJSONOutput(output: string, sub: string, enhancedSWAs: SWA[]
 }
 
 export function writeCSVOutput(output: string, sub: string, enhancedSWAs: SWA[]) {
-    let csv = 'SWA Name, Subscription, Resource Group, repositoryUrl, SKU Tier, Domain, WAF, WAF Product, Private Endpoints, Linked Backends, Database Connection \n';
+    let csv = 'SWA Name, Subscription, Resource Group, repositoryUrl, SKU Tier, Domain, WAF, WAF Product, HTTP Status code, Private Endpoints, Linked Backends, Database Connection \n';
     for (const swa of enhancedSWAs) {
-        csv += `${swa.name}, ${sub}, ${swa.resourceGroup}, ${swa.repositoryUrl}, ${swa.sku.tier},${swa.defaultHostname.domain}, ${swa.defaultHostname.waf}, ${swa.defaultHostname.waf ? `${swa.defaultHostname.firewall} - ${swa.defaultHostname.manufacturer}` : 'None'}, ${swa.privateEndpointConnections?.length > 0}, ${swa.linkedBackends?.length > 0}, ${swa.databaseConnections.length > 0} \n`;
+        csv += `${swa.name}, ${sub}, ${swa.resourceGroup}, ${swa.repositoryUrl}, ${swa.sku.tier},${swa.defaultHostname.domain}, ${swa.defaultHostname.waf}, ${swa.defaultHostname.waf ? `${swa.defaultHostname.firewall} - ${swa.defaultHostname.manufacturer}` : 'None'}, ${swa.defaultHostname.httpStatusCode}, ${swa.privateEndpointConnections?.length > 0}, ${swa.linkedBackends?.length > 0}, ${swa.databaseConnections.length > 0} \n`;
         for (const customDomain of swa.customDomains) {
-            csv += `${swa.name}, ${sub}, ${swa.resourceGroup}, ${swa.repositoryUrl}, ${swa.sku.tier}, ${customDomain.domain}, ${customDomain.waf}, ${customDomain.waf ? `${customDomain.firewall} - ${customDomain.manufacturer}` : 'None'}, ${swa.privateEndpointConnections?.length > 0}, ${swa.linkedBackends?.length > 0}, ${swa.databaseConnections?.length > 0} \n`;
+            csv += `${swa.name}, ${sub}, ${swa.resourceGroup}, ${swa.repositoryUrl}, ${swa.sku.tier}, ${customDomain.domain}, ${customDomain.waf}, ${customDomain.waf ? `${customDomain.firewall} - ${customDomain.manufacturer}` : 'None'}, ${customDomain.httpStatusCode}, ${swa.privateEndpointConnections?.length > 0}, ${swa.linkedBackends?.length > 0}, ${swa.databaseConnections?.length > 0} \n`;
         }
     }
     writeFile(output, csv, (err) => {
