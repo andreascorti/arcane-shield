@@ -1,33 +1,39 @@
 import chalk from "chalk";
-import { exec as execCb } from "node:child_process";
-import { promisify } from "node:util";
-import type { SWA, SecureDomain } from "../swa.types.js";
+import type { SWA } from "../swa.types.js";
+import type { DefaultAzureCredential } from "@azure/identity";
+import { WebSiteManagementClient } from "@azure/arm-appservice";
 
-const exec = promisify(execCb);
-
-export async function retrieveStaticWebApps(subscriptionId: string) {
+export async function retrieveStaticWebApps(
+	creds: DefaultAzureCredential,
+	subscriptionId: string,
+) {
 	console.log(
-		chalk.blue`Retrieving resources for subscription ${subscriptionId}`,
+		chalk.blue(`Retrieving resources for subscription ${subscriptionId}`),
 	);
-	const staticWebApps = await exec(
-		`az staticwebapp list --subscription ${subscriptionId}`
-	);
-  if (staticWebApps.stderr) {
-    console.log(
-      chalk.red`An error occurred while trying to retrieve the resources.`,
-    );
-  }
-  const swaList = JSON.parse(staticWebApps.stdout);
-  return swaList.map((swa: SWA) => (
-    {
-      name: swa.name, 
-      defaultHostname: {domain: swa.defaultHostname},
-      resourceGroup: swa.resourceGroup,
-      repositoryUrl: swa.repositoryUrl,
-      sku: {tier: swa.sku.tier},
-      customDomains: swa.customDomains.map((domain: SecureDomain) => ({domain})),
-      linkedBackends: swa.linkedBackends,
-      privateEndpointConnections: swa.privateEndpointConnections,
-      databaseConnections: swa.databaseConnections
-    }));
+	const serviceAppClient = new WebSiteManagementClient(creds, subscriptionId);
+	const staticWebApps = serviceAppClient.staticSites.list();
+	const swaList: SWA[] = [];
+	for await (const swa of staticWebApps) {
+		console.log(
+			chalk.blue(`Retrieved ${swa.name} from subscription ${subscriptionId}`),
+		);
+		swaList.push({
+			name: swa.name ?? "unknown",
+			defaultHostname: { domain: swa.defaultHostname ?? "unknown" },
+			resourceGroup: swa.id?.split("/")[4] ?? "unknown",
+			repositoryUrl: swa.repositoryUrl ?? "unknown",
+			sku: { tier: swa.sku?.tier ?? "unknown" },
+			customDomains:
+				swa.customDomains?.map((domain: string) => ({ domain })) ?? [],
+			linkedBackends:
+				swa.linkedBackends?.map(
+					(linkedBackend) => linkedBackend.backendResourceId ?? "unknown",
+				) ?? [],
+			privateEndpointConnections:
+				swa.privateEndpointConnections?.map((pe) => pe.name ?? "unknown") ?? [],
+			databaseConnections:
+				swa.databaseConnections?.map((db) => db.name ?? "unknown") ?? [],
+		});
+	}
+	return swaList;
 }

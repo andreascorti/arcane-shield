@@ -18,6 +18,7 @@ arcane-shield
 ## Features:
 ### WAF Checking
 Check for each Domain configured in a static web app if a WAF is detected.
+It requires [wafw00f](https://github.com/EnableSecurity/wafw00f) to be installed
 ### Check private endpoints
 Check if the static web app is configured to be in a VNet
 
